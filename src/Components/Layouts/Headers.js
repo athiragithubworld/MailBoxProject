@@ -1,11 +1,19 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../Store/AuthSlice";
 
 const Headers = () => {
+  const dispatch = useDispatch();
+
+  const LogoutHandler = () => {
+    dispatch(authActions.logout());
+  };
+
   return (
     <div>
       <nav
         className="navbar bg-dark border-bottom border-body"
-        // data-bs-theme="#573b8a"
+        data-bs-theme="#573b8a"
         style={{ color: "#573b8a" }}
       >
         <h1
@@ -19,8 +27,19 @@ const Headers = () => {
             // textAlign: "left",
           }}
         >
-          Cloud Mail
+          Welcome to Cloud Mail
         </h1>
+
+        <span style={{ marginLeft: "120px" }}>
+          <button
+            style={{ borderRadius: "20px" }}
+            type="button"
+            className="btn btn-outline-danger"
+            onClick={LogoutHandler}
+          >
+            Logout
+          </button>
+        </span>
       </nav>
     </div>
   );
