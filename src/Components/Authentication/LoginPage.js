@@ -1,170 +1,140 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./LoginPage.css";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../Store/AuthSlice";
 
 const LoginPage = () => {
   const inputEmail = useRef();
   const inputPassword = useRef();
   const inputConfirmPassword = useRef();
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [login, setLogin] = useState(false);
 
-  let url = "";
+  const dispatch = useDispatch();
 
-  const loginHandler = (event) => {
-    event.prevenDefault();
+  const switchAuthModeHandler = (event) => {
+    event.preventDefault();
+    setLogin((prevState) => !prevState);
   };
 
-  const switchAuthModeHandler = () => {
-    setIsLogin((prevState) => !prevState);
-  };
-
-  const signUpHandler = (event) => {
+  const submitHandler = (event) => {
     event.preventDefault();
 
     const enteredEmail = inputEmail.current.value;
     const enteredPassword = inputPassword.current.value;
-    const enteredConfirmPassword = inputConfirmPassword.current.value;
 
-    if (
-      enteredEmail.includes("@") &&
-      enteredPassword.trim().length > 6 &&
-      enteredConfirmPassword.trim().length > 6
-    ) {
-      if (enteredPassword === enteredConfirmPassword) {
+    console.log("email", enteredEmail);
+    console.log("pass", enteredPassword);
+
+    if (enteredEmail.includes("@") && enteredPassword.trim().length > 6) {
+      let url = "";
+      if (login) {
         url =
-          "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAW3HHSmF3d1gplJ7H71iATFTnR70fNHmo";
-
-        fetch(url, {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.ok) {
-              console.log("Sign Up");
-              alert(" Sucessfully Signed Up ");
-              return response.json();
-            } else {
-              return response.json().then((data) => {
-                let errormessage = "Authentication Failed";
-                // if (data && data.error && data.error.message) {
-                //   errormessage = data.error.message;
-                // }
-
-                throw new Error(errormessage);
-              });
-            }
-          })
-          .then((data) => {
-            console.log("loginid", data.idToken);
-
-            const email = data.email.replace(/[@.]/g, "");
-
-            // // authcontext api
-            // // authcntx.login(data.idToken, email);
-
-            // // dispatch the value
-            // dispatch(authActions.login({ token: data.idToken, email: email }));
-
-            // // console.log("email", email);
-            // // cartcntx.addProduct({ email: email });
-            // // navigate("/store");
-          })
-          .catch((err) => {
-            alert(err.message);
-          });
-      } else if (enteredPassword !== enteredConfirmPassword) {
-        return alert(" Please enter same password ");
+          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAW3HHSmF3d1gplJ7H71iATFTnR70fNHmo";
+      } else {
+        const enteredConfirmPassword = inputConfirmPassword.current.value;
+        if (enteredPassword === enteredConfirmPassword) {
+          url =
+            "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAW3HHSmF3d1gplJ7H71iATFTnR70fNHmo";
+        } else if (enteredPassword !== enteredConfirmPassword) {
+          return alert(" Please enter same password ");
+        }
+        inputConfirmPassword.current.value = "";
       }
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            return response.json().then((data) => {
+              let errormessage = "Authentication Failed";
+              // if (data && data.error && data.error.message) {
+              //   errormessage = data.error.message;
+              // }
+
+              throw new Error(errormessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log("loginid", data.idToken);
+
+          const email = data.email.replace(/[@.]/g, "");
+
+          // authcontext api
+          // authcntx.login(data.idToken, email);
+
+          // dispatch the value
+          dispatch(authActions.login({ token: data.idToken, email: email }));
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
     } else {
-      alert("Please enter valid data");
+      return alert("Please enter valid data");
     }
 
     inputEmail.current.value = "";
     inputPassword.current.value = "";
-    inputConfirmPassword.current.value = "";
   };
-
   return (
     <div>
-      <div class="main">
-        <input type="checkbox" id="chk" aria-hidden="true" />
-
-        <div class="login">
-          <form class="form">
-            <label for="chk" aria-hidden="true">
-              Log in
-            </label>
+      <div className="form-box">
+        <form className="form" onSubmit={submitHandler}>
+          <span className="title">{login ? "Log In" : "Sign Up"}</span>
+          <span className="subtitle">
+            {!login
+              ? "Create a free account with your email."
+              : "Enter your Email and Password to Login"}
+          </span>
+          <div className="form-container">
             <input
-              class="input"
               type="email"
-              name="email"
+              className="input"
               placeholder="Email"
-              required=""
-            />
-            <input
-              class="input"
-              type="password"
-              name="pswd"
-              placeholder="Password"
-              required=""
-            />
-            {/* {!isLogin && (
-              <div className="form_control">
-                <input
-                  required
-                  className="input"
-                  type="password"
-                  ref={inputConfirmPassword}
-                />
-                <label className="label"> Confirm Password</label>
-              </div>
-            )} */}
-            <button onClick={loginHandler}>
-              {/* {isLogin ? "Login" : "Sign Up"} */}
-              Log in
-            </button>
-          </form>
-        </div>
-
-        <div class="register">
-          <form class="form">
-            <label for="chk" aria-hidden="true">
-              Sign Up
-            </label>
-
-            <input
-              class="input"
-              type="email"
-              name="email"
-              placeholder="Email"
-              required=""
               ref={inputEmail}
+              // required=""
             />
             <input
-              class="input"
               type="password"
-              name="pswd"
+              className="input"
               placeholder="Password"
-              required=""
               ref={inputPassword}
+              // required=""
             />
-            <input
-              class="input"
-              type="password"
-              name="pswd"
-              placeholder="Confirm Password"
-              required=""
-              ref={inputConfirmPassword}
-            />
-            <button onClick={signUpHandler}>Sign Up</button>
-          </form>
+            {!login && (
+              <input
+                type="password"
+                className="input"
+                placeholder="Confirm Password"
+                ref={inputConfirmPassword}
+                required=""
+              />
+            )}
+          </div>
+          <button>{!login ? "Sign up" : "Login"}</button>
+        </form>
+        <div className="form-section" onClick={switchAuthModeHandler}>
+          {!login && (
+            <p>
+              Have an account? <a href="">Log in</a>{" "}
+            </p>
+          )}
+          {login && (
+            <p>
+              Create new account? <a href="">Sign Up</a>{" "}
+            </p>
+          )}
         </div>
       </div>
     </div>
