@@ -12,9 +12,9 @@ const Headers = () => {
   return (
     <div>
       <nav
-        className="navbar bg-dark border-bottom border-body"
+        className="navbar  border-bottom border-body"
         data-bs-theme="#573b8a"
-        style={{ color: "#573b8a" }}
+        style={{ backgroundColor: "black" }}
       >
         <h1
           style={{
