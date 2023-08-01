@@ -70,12 +70,18 @@ const LoginPage = () => {
           console.log("loginid", data.idToken);
 
           const email = data.email.replace(/[@.]/g, "");
-
+          const emailId = data.email;
           // authcontext api
           // authcntx.login(data.idToken, email);
 
           // dispatch the value
-          dispatch(authActions.login({ token: data.idToken, email: email }));
+          dispatch(
+            authActions.login({
+              token: data.idToken,
+              email: email,
+              emailId: emailId,
+            })
+          );
         })
         .catch((err) => {
           alert(err.message);
