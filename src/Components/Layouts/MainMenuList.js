@@ -1,7 +1,14 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import ComposeMail from "../Pages/ComposeMail";
+import { NavLink } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import SentMail from "../Pages/SentMail";
+import DraftMail from "../Pages/DraftMail";
+import Inbox from "../Pages/Inbox";
 
 const MainMenuList = () => {
+  const auth = useSelector((state) => state.auth);
   return (
     <>
       <div className="row">
@@ -23,7 +30,7 @@ const MainMenuList = () => {
                 marginBottom: "20px",
               }}
             >
-              Compose
+              <NavLink to="/compose">Compose</NavLink>
             </button>
             <div class="list-group" style={{ gap: 15 }} role="tablist">
               <button
@@ -31,56 +38,56 @@ const MainMenuList = () => {
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Inbox
+                <NavLink to="/inbox">Inbox</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Starred
+                <NavLink to="/draft">Draft</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Snoozed
+                <NavLink to="/allmails">All Mails</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Sent
+                <NavLink to="/sent">Sent</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Draft
+                <NavLink to="/starred">Starred</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                All Mails
+                <NavLink to="/snoozed">Snoozed</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Spam
+                <NavLink to="/snoozed">Spam</NavLink>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
               >
-                Trash
+                <NavLink to="/snoozed">Trash</NavLink>
               </button>
             </div>
           </div>
@@ -91,14 +98,29 @@ const MainMenuList = () => {
             className="container-sm"
             style={{
               backgroundColor: "white",
-              // width: "77rem",
               marginTop: "10px",
               marginLeft: "50px",
               marginRight: "10px",
               marginBottom: "5px",
+              maxWidth: "1250px",
+              maxHeight: "1500px",
+              minHeight: "600px",
             }}
           >
-            <ComposeMail />
+            <Routes>
+              {auth.isLoggedIn && (
+                <Route path="/compose" element={<ComposeMail />}></Route>
+              )}
+              {auth.isLoggedIn && (
+                <Route path="/inbox" element={<Inbox />}></Route>
+              )}
+              {auth.isLoggedIn && (
+                <Route path="/draft" element={<DraftMail />}></Route>
+              )}
+              {auth.isLoggedIn && (
+                <Route path="/sent" element={<SentMail />}></Route>
+              )}
+            </Routes>
           </div>
         </div>
       </div>
