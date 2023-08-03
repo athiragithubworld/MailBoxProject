@@ -1,15 +1,18 @@
 import React, { useRef, useState } from "react";
-import { EditorState, convertToRaw, ContentState } from "draft-js";
+import { EditorState } from "draft-js";
 // import { Editor } from "react-draft-wysiwyg";
 
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"; // Import Draft Wysiwyg styles
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { SentMailActions } from "../../Store/SentMailSlice";
+import { convertToHTML } from "draft-convert";
 
 const ComposeMail = () => {
   const auth = useSelector((state) => state.auth);
-  const inputEmail = useRef();
+  const dispatch = useDispatch();
+  const [inputEmail, setInputMail] = useState("");
   const inputSubject = useRef("");
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -18,41 +21,82 @@ const ComposeMail = () => {
     setEditorState(newEditorState);
   };
 
-  // const [editorState, setEditorState] = useState(() =>
-  //   EditorState.createEmpty()
-  // );
+  const emailHandler = (event) => {
+    setInputMail(event.target.value);
+  };
 
   const sendMailHandler = (event) => {
-    const contentState = editorState.getCurrentContent();
-    const contentRaw = convertToRaw(contentState);
-    const contentText = contentState.getPlainText();
+    const contentText = convertToHTML(editorState.getCurrentContent());
 
-    const mailItem = {
-      toEmail: inputEmail.current.value,
-      fromEmail: auth.emailId,
+    const sendMailItem = {
+      toEmail: inputEmail,
+      // fromEmail: auth.emailId,
       subject: inputSubject.current.value,
       mailContent: contentText,
+      date: new Date(),
       id: Math.random().toString(),
     };
 
-    if (mailItem) {
+    if (inputEmail !== "" && inputSubject.current.value !== "") {
       axios
         .post(
           `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/sendMailData.json`,
-          mailItem
+          sendMailItem
         )
         .then((response) => {
           console.log("res", response.data);
+          dispatch(SentMailActions.sentMail(sendMailItem));
+          alert("Mail sent successfully");
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    } else {
+      return alert("Enter valid data ");
+    }
+
+    const recieveMailItem = {
+      // toEmail: auth.emailId,
+      fromEmail: auth.emailId,
+      subject: inputSubject.current.value,
+      mailContent: contentText,
+      date: new Date(),
+      id: Math.random().toString(),
+    };
+
+    if (inputEmail !== "" && inputSubject.current.value !== "") {
+      const inputmail = inputEmail.replace(/[@.]/g, "");
+      axios
+        .post(
+          `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${inputmail}/recieveMailData.json`,
+          recieveMailItem
+        )
+        .then((response) => {
+          console.log("res", response.data);
+          dispatch(SentMailActions.inboxMail(recieveMailItem));
         })
         .catch((error) => {
           console.log("error", error);
         });
     }
+
+    setInputMail("");
+    inputSubject.current.value = "";
+    setEditorState(editorState.createEmpty);
   };
 
   return (
     <>
-      <div className="container">
+      <div
+        className="container-sm"
+        style={{
+          backgroundColor: "white",
+          marginTop: "10px",
+          marginLeft: "50px",
+          marginRight: "10px",
+          marginBottom: "5px",
+        }}
+      >
         <p class="text-center">New Message</p>
 
         <form>
@@ -66,7 +110,8 @@ const ComposeMail = () => {
                 class="form-control"
                 id="to"
                 placeholder="Type email"
-                ref={inputEmail}
+                value={inputEmail}
+                onChange={emailHandler}
               />
             </div>
           </div>
@@ -103,17 +148,6 @@ const ComposeMail = () => {
                 // padding: "12px",
               }}
             >
-              {/* <textarea
-                className="form-control"
-                rows="12"
-                cols="50"
-                name="content"
-                form="usrform"
-                type="text"
-                id="text"
-                placeholder="Click here to reply"
-                value={inputMailContent}
-              ></textarea> */}
               <Editor
                 editorState={editorState}
                 onEditorStateChange={handleChange}
