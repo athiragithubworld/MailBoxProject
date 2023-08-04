@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { SentMailActions } from "../../Store/SentMailSlice";
 import { convertToHTML } from "draft-convert";
+import { inboxActions } from "../../Store/InboxSlice";
 
 const ComposeMail = () => {
   const auth = useSelector((state) => state.auth);
@@ -35,6 +36,7 @@ const ComposeMail = () => {
       mailContent: contentText,
       date: new Date(),
       id: Math.random().toString(),
+      unread: true,
     };
 
     if (inputEmail !== "" && inputSubject.current.value !== "") {
@@ -45,7 +47,7 @@ const ComposeMail = () => {
         )
         .then((response) => {
           console.log("res", response.data);
-          dispatch(SentMailActions.sentMail(sendMailItem));
+          // dispatch(SentMailActions.sentMail(sendMailItem));
           alert("Mail sent successfully");
         })
         .catch((error) => {
@@ -62,6 +64,7 @@ const ComposeMail = () => {
       mailContent: contentText,
       date: new Date(),
       id: Math.random().toString(),
+      unread: true,
     };
 
     if (inputEmail !== "" && inputSubject.current.value !== "") {
@@ -73,7 +76,7 @@ const ComposeMail = () => {
         )
         .then((response) => {
           console.log("res", response.data);
-          dispatch(SentMailActions.inboxMail(recieveMailItem));
+          // dispatch(inboxActions.inboxMail(recieveMailItem));
         })
         .catch((error) => {
           console.log("error", error);
@@ -96,6 +99,17 @@ const ComposeMail = () => {
           marginRight: "10px",
           marginBottom: "5px",
         }}
+        // className="container-sm"
+        // style={{
+        //   backgroundColor: "white",
+        //   marginTop: "0px",
+        //   marginLeft: "180px",
+        //   marginRight: "10px",
+        //   // marginBottom: "5px",
+        //   maxWidth: "1250px",
+        //   maxHeight: "1500px",
+        //   minHeight: "600px",
+        // }}
       >
         <p class="text-center">New Message</p>
 
