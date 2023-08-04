@@ -6,7 +6,8 @@ import { Routes, Route } from "react-router-dom";
 import SentMail from "../Pages/SentMail";
 import DraftMail from "../Pages/DraftMail";
 import Inbox from "../Pages/Inbox";
-import ViewMessage from "../Pages/ViewMessage";
+import ViewInboxMail from "../Pages/ViewInboxMail";
+import ViewSentMail from "../Pages/ViewSentMail";
 import axios from "axios";
 import { inboxActions } from "../../Store/InboxSlice";
 
@@ -214,7 +215,10 @@ const MainMenuList = () => {
                 <Route path="/sent" element={<SentMail />}></Route>
               )}
               {auth.isLoggedIn && (
-                <Route path="/viewmessage" element={<ViewMessage />}></Route>
+                <Route path="/viewmessage" element={<ViewInboxMail />}></Route>
+              )}
+              {auth.isLoggedIn && (
+                <Route path="/viewSentMail" element={<ViewSentMail />}></Route>
               )}
             </Routes>
           </div>
