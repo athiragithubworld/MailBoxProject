@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   inboxMails: [],
-  totalRecieveMail: 0,
+  // totalRecieveMail: 0,
   unread: true,
   viewMail: JSON.parse(localStorage.getItem("viewMail")),
 };
