@@ -11,7 +11,8 @@ import Inbox from "./Components/Pages/Inbox";
 import axios from "axios";
 // import { MailBoxActions } from "./Store/MailBoxSlice";
 import { inboxActions } from "./Store/InboxSlice";
-import ViewMessage from "./Components/Pages/ViewMessage";
+import { SentMailActions } from "./Store/SentMailSlice";
+// import ViewMessage from "./Components/Pages/ViewMessage";
 
 function App() {
   const auth = useSelector((state) => state.auth);
@@ -47,15 +48,49 @@ function App() {
         console.log(error);
       });
   };
+
+  const sentedMailData = () => {
+    axios
+      .get(
+        `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/sendMailData.json`
+      )
+      .then((response) => {
+        console.log("get response", response.data);
+        const data = response.data;
+        const sentedMails = [];
+        for (const key in data) {
+          // totalAmount += data[key].expenseAmount;
+
+          sentedMails.push({
+            key: key,
+            // toEmail: data[key].toEmail,
+            toEmail: data[key].toEmail,
+            date: data[key].date,
+            subject: data[key].subject,
+            mailContent: data[key].mailContent,
+            id: data[key].id,
+            unread: data[key].unread,
+          });
+        }
+        console.log("sent data", sentedMails);
+        dispatch(SentMailActions.sentedMails(sentedMails));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     if (auth.isLoggedIn) {
       receiveMailData();
+      sentedMailData();
     }
   }, []);
 
   useEffect(() => {
     //  if (auth.isLoggedIn) {
     receiveMailData();
+    sentedMailData();
     //  }
   }, [auth.isLoggedIn]);
 
