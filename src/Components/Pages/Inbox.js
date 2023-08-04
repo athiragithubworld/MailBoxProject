@@ -27,9 +27,9 @@ const Inbox = () => {
     console.log("item", item);
     if (item) {
       const { key, ...rest } = item;
-      console.log("without key", rest);
+      // console.log("without key", rest);
       const newItem = { ...rest, unread: false };
-      console.log("unread", newItem);
+      // console.log("unread", newItem);
       axios
         .put(
           `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData/${item.key}.json`,
@@ -42,9 +42,24 @@ const Inbox = () => {
         })
         .catch((error) => {
           console.log("error", error);
-          return alert(error);
+          return alert("err", error);
         });
     }
+  };
+
+  const onDeleteHandler = (item) => {
+    // console.log("delete", item);
+    axios
+      .delete(
+        `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData/${item.key}.json`
+      )
+      .then((response) => {
+        console.log("res", response);
+        dispatch(inboxActions.deleteMail(item));
+      })
+      .catch((error) => {
+        console.log("err", error);
+      });
   };
 
   return (
@@ -181,7 +196,14 @@ const Inbox = () => {
                             <IoIosMail />
                           </td>
                           <td class="action">
-                            <MdDelete />
+                            {/* <button> */}{" "}
+                            <MdDelete
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteHandler(item);
+                              }}
+                            />{" "}
+                            {/* </button> */}
                           </td>
                         </tr>
                       ))
