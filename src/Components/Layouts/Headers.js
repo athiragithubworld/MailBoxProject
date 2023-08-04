@@ -1,11 +1,15 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../Store/AuthSlice";
+import { useNavigate } from "react-router-dom";
 
 const Headers = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const LogoutHandler = () => {
+    navigate(navigate("/inbox", { replace: true }));
+    localStorage.removeItem("viewMail");
     dispatch(authActions.logout());
   };
 
@@ -14,7 +18,7 @@ const Headers = () => {
       <nav
         className="navbar  border-bottom border-body"
         data-bs-theme="#573b8a"
-        style={{ backgroundColor: "black" }}
+        style={{ backgroundColor: "black", marginTop: "0px", gap: 2 }}
       >
         <h1
           style={{
@@ -23,7 +27,7 @@ const Headers = () => {
             fontFamily: "Arila",
             fontWeight: "bold",
             fontStyle: "oblique",
-            // marginLeft: 0,
+
             // textAlign: "left",
           }}
         >
