@@ -1,14 +1,77 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ComposeMail from "../Pages/ComposeMail";
-import { NavLink } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import SentMail from "../Pages/SentMail";
 import DraftMail from "../Pages/DraftMail";
 import Inbox from "../Pages/Inbox";
+import ViewMessage from "../Pages/ViewMessage";
+import axios from "axios";
+import { inboxActions } from "../../Store/InboxSlice";
 
 const MainMenuList = () => {
   const auth = useSelector((state) => state.auth);
+  const inbox = useSelector((state) => state.inboxMail.inboxMails);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  let totalUnread = 0;
+  inbox.forEach((item) => {
+    if (item.unread === true) {
+      totalUnread++;
+    }
+  });
+
+  const composeHandler = () => {
+    navigate("/compose", { replace: true });
+    // <Navigate to="/compose" replace={true} />;
+  };
+
+  const inboxHandler = () => {
+    // <Navigate to="/inbox" replace={true} />;
+
+    axios
+      .get(
+        `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData.json`
+      )
+      .then((response) => {
+        console.log("get response", response.data);
+        const data = response.data;
+        const recievedMails = [];
+        for (const key in data) {
+          // totalAmount += data[key].expenseAmount;
+
+          recievedMails.push({
+            key: key,
+            // toEmail: data[key].toEmail,
+            fromEmail: data[key].fromEmail,
+            date: data[key].date,
+            subject: data[key].subject,
+            mailContent: data[key].mailContent,
+            id: data[key].id,
+            unread: data[key].unread,
+          });
+        }
+        console.log("recieve data", recievedMails);
+        dispatch(inboxActions.receivedMails(recievedMails));
+        navigate("/inbox", { replace: true });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const draftHandler = () => {
+    navigate("/draft", { replace: true });
+    // <Navigate to="/draft" replace={true} />;
+  };
+
+  const sentHandler = () => {
+    navigate("/sent", { replace: true });
+    // <Navigate to="/sent" replace={true} />;
+  };
+
   return (
     <>
       <div className="row">
@@ -19,6 +82,7 @@ const MainMenuList = () => {
               width: "10rem",
               height: "630px",
               backgroundColor: "rgb(55, 54, 54)",
+              marginTop: "10px",
             }}
           >
             <button
@@ -29,65 +93,94 @@ const MainMenuList = () => {
                 paddingBottom: "10px",
                 marginBottom: "20px",
               }}
+              onClick={composeHandler}
             >
-              <NavLink to="/compose">Compose</NavLink>
+              Compose
+              {/* <NavLink to="/compose">Compose</NavLink> */}
             </button>
             <div class="list-group" style={{ gap: 15 }} role="tablist">
               <button
                 type="button"
                 class="btn btn-outline-info"
-                style={{ border: "0px" }}
+                style={{ border: "0px", gap: 5 }}
+                onClick={inboxHandler}
               >
-                <NavLink to="/inbox">Inbox</NavLink>
+                Inbox
+                <>
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      padding: "8px",
+                      color: "red",
+                      fontSize: "20px",
+                    }}
+                  >
+                    {totalUnread}
+                  </span>
+                </>
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                onClick={draftHandler}
               >
-                <NavLink to="/draft">Draft</NavLink>
+                Draft
+                {/* <NavLink to="/draft">Draft</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                // onClick={allMailsHandler}
               >
-                <NavLink to="/allmails">All Mails</NavLink>
+                All Mails
+                {/* <NavLink to="/allmails">All Mails</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                onClick={sentHandler}
               >
-                <NavLink to="/sent">Sent</NavLink>
+                Sent
+                {/* <NavLink to="/sent">Sent</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                // onClick={starredHandler}
               >
-                <NavLink to="/starred">Starred</NavLink>
+                Starred
+                {/* <NavLink to="/starred">Starred</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                // onClick={snoozedHandler}
               >
-                <NavLink to="/snoozed">Snoozed</NavLink>
+                Snoozed
+                {/* <NavLink to="/snoozed">Snoozed</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                // onClick={spamHandler}
               >
-                <NavLink to="/snoozed">Spam</NavLink>
+                Spam
+                {/* <NavLink to="/snoozed">Spam</NavLink> */}
               </button>
               <button
                 type="button"
                 class="btn btn-outline-info"
                 style={{ border: "0px" }}
+                // onClick={trashHandler}
               >
-                <NavLink to="/snoozed">Trash</NavLink>
+                Trash
+                {/* <NavLink to="/snoozed">Trash</NavLink> */}
               </button>
             </div>
           </div>
@@ -119,6 +212,9 @@ const MainMenuList = () => {
               )}
               {auth.isLoggedIn && (
                 <Route path="/sent" element={<SentMail />}></Route>
+              )}
+              {auth.isLoggedIn && (
+                <Route path="/viewmessage" element={<ViewMessage />}></Route>
               )}
             </Routes>
           </div>
