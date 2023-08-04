@@ -22,6 +22,11 @@ const inboxSlice = createSlice({
       state.viewMail = action.payload;
       localStorage.setItem("viewMail", JSON.stringify(action.payload));
     },
+    deleteMail(state, action) {
+      state.inboxMails = state.inboxMails.filter(
+        (item) => item.id !== action.payload.id
+      );
+    },
   },
 });
 
