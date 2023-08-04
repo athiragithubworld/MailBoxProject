@@ -8,8 +8,9 @@ const Headers = () => {
   const navigate = useNavigate();
 
   const LogoutHandler = () => {
-    navigate(navigate("/inbox", { replace: true }));
     localStorage.removeItem("viewMail");
+    localStorage.removeItem("viewSentMail");
+    navigate("/", { replace: true });
     dispatch(authActions.logout());
   };
 
