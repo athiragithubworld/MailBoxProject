@@ -4,13 +4,14 @@ import LoginPage from "./Components/Authentication/LoginPage";
 import Headers from "./Components/Layouts/Headers";
 import { Routes, Route } from "react-router-dom";
 import MainMenuList from "./Components/Layouts/MainMenuList";
-// import ComposeMail from "./Components/Pages/ComposeMail";
-// import DraftMail from "./Components/Pages/DraftMail";
-// import SentMail from "./Components/Pages/SentMail";
-// import Inbox from "./Components/Pages/Inbox";
+import ComposeMail from "./Components/Pages/ComposeMail";
+import DraftMail from "./Components/Pages/DraftMail";
+import SentMail from "./Components/Pages/SentMail";
+import Inbox from "./Components/Pages/Inbox";
 import axios from "axios";
-import { MailBoxActions } from "./Store/MailBoxSlice";
+// import { MailBoxActions } from "./Store/MailBoxSlice";
 import { inboxActions } from "./Store/InboxSlice";
+import ViewMessage from "./Components/Pages/ViewMessage";
 
 function App() {
   const auth = useSelector((state) => state.auth);
@@ -36,6 +37,7 @@ function App() {
             subject: data[key].subject,
             mailContent: data[key].mailContent,
             id: data[key].id,
+            unread: data[key].unread,
           });
         }
         console.log("recieve data", recievedMails);
@@ -50,6 +52,13 @@ function App() {
       receiveMailData();
     }
   }, []);
+
+  useEffect(() => {
+    //  if (auth.isLoggedIn) {
+    receiveMailData();
+    //  }
+  }, [auth.isLoggedIn]);
+
   return (
     <div>
       {auth.isLoggedIn && <Headers />}
@@ -58,13 +67,18 @@ function App() {
       <Routes>
         {!auth.isLoggedIn && <Route path="/" element={<LoginPage />}></Route>}
         {/* {auth.isLoggedIn && (
+          <Route path="/viewmessage" element={<ViewMessage />}></Route>
+        )} */}
+        {/* {auth.isLoggedIn && (
           <Route path="/compose" element={<ComposeMail />}></Route>
-        )}
-        {auth.isLoggedIn && <Route path="/inbox" element={<Inbox />}></Route>}
+        )} */}
+        {/* {auth.isLoggedIn && <Route path="/inbox" element={<Inbox />}></Route>}
+       
         {auth.isLoggedIn && (
           <Route path="/draft" element={<DraftMail />}></Route>
-        )}
-        {auth.isLoggedIn && <Route path="/sent" element={<SentMail />}></Route>} */}
+        )} */}
+        {/* {auth.isLoggedIn && <Route path="/sent" element={<SentMail />}></Route>} */}
+        {/* {auth.isLoggedIn && <Route path="/starred" element={<Starred />}></Route>} */}
       </Routes>
     </div>
   );
