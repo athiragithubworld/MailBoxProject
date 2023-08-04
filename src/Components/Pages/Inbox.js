@@ -1,14 +1,51 @@
 import React from "react";
 import { GrSearch } from "react-icons/gr";
 import { CiStar } from "react-icons/ci";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MdDelete } from "react-icons/md";
 import { IoIosMail } from "react-icons/io";
+import { inboxActions } from "../../Store/InboxSlice";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Inbox = () => {
   const inbox = useSelector((state) => state.inboxMail);
+  const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const inboxMaillen = inbox.inboxMails.length;
+  console.log("mails", inbox.inboxMails);
+
+  const viewMailHandler = (item) => {
+    dispatch(inboxActions.viewMail(item));
+    // dispatch(inboxActions.readMessage(false));
+
+    navigate("/viewmessage", { replace: true });
+    // <Navigate to="/viewmessage" replace={true} />;
+
+    console.log("item", item);
+    if (item) {
+      const { key, ...rest } = item;
+      console.log("without key", rest);
+      const newItem = { ...rest, unread: false };
+      console.log("unread", newItem);
+      axios
+        .put(
+          `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData/${item.key}.json`,
+          newItem
+        )
+        .then((response) => {
+          console.log("res", response.data);
+          // dispatch(inboxActions.readMessage(false));
+          // dispatch(inboxActions.inboxMail(newItem));
+        })
+        .catch((error) => {
+          console.log("error", error);
+          return alert(error);
+        });
+    }
+  };
 
   return (
     <div>
@@ -127,9 +164,12 @@ const Inbox = () => {
                   {/* {console.log(mailBoxData.receivedMails)} */}
                   {inboxMaillen > 0
                     ? inbox.inboxMails.map((item) => (
-                        <tr key={item.key}>
+                        <tr
+                          key={item.key}
+                          onClick={() => viewMailHandler(item)}
+                        >
                           <td class="action">
-                            <input type="radio" />
+                            <input type="radio" checked={item.unread} />
                           </td>
                           <td class="action">
                             <CiStar />
