@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { inboxMails: [], totalRecieveMail: 0 };
+const initialState = {
+  inboxMails: [],
+  totalRecieveMail: 0,
+  unread: true,
+  viewMail: JSON.parse(localStorage.getItem("viewMail")),
+};
 
 const inboxSlice = createSlice({
   name: "inbox",
@@ -9,8 +14,13 @@ const inboxSlice = createSlice({
     receivedMails(state, action) {
       state.inboxMails = action.payload;
     },
-    inboxMail(state, action) {
-      state.inboxMails = [action.payload, ...state.inboxMails];
+
+    readMessage(state, action) {
+      state.unread = action.payload;
+    },
+    viewMail(state, action) {
+      state.viewMail = action.payload;
+      localStorage.setItem("viewMail", JSON.stringify(action.payload));
     },
   },
 });
