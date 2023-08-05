@@ -18,11 +18,13 @@ const MainMenuList = () => {
   const navigate = useNavigate();
 
   let totalUnread = 0;
-  inbox.forEach((item) => {
-    if (item.unread === true) {
-      totalUnread++;
-    }
-  });
+  if (inbox) {
+    inbox.forEach((item) => {
+      if (item.unread === true) {
+        totalUnread++;
+      }
+    });
+  }
 
   const composeHandler = () => {
     navigate("/compose", { replace: true });
@@ -31,36 +33,36 @@ const MainMenuList = () => {
 
   const inboxHandler = () => {
     // <Navigate to="/inbox" replace={true} />;
+    navigate("/inbox", { replace: true });
+    // axios
+    //   .get(
+    //     `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData.json`
+    //   )
+    //   .then((response) => {
+    //     console.log("get response", response.data);
+    //     const data = response.data;
+    //     const recievedMails = [];
+    //     for (const key in data) {
+    //       // totalAmount += data[key].expenseAmount;
 
-    axios
-      .get(
-        `https://mailboxproject-f1499-default-rtdb.firebaseio.com/${auth.email}/recieveMailData.json`
-      )
-      .then((response) => {
-        console.log("get response", response.data);
-        const data = response.data;
-        const recievedMails = [];
-        for (const key in data) {
-          // totalAmount += data[key].expenseAmount;
-
-          recievedMails.push({
-            key: key,
-            // toEmail: data[key].toEmail,
-            fromEmail: data[key].fromEmail,
-            date: data[key].date,
-            subject: data[key].subject,
-            mailContent: data[key].mailContent,
-            id: data[key].id,
-            unread: data[key].unread,
-          });
-        }
-        console.log("recieve data", recievedMails);
-        dispatch(inboxActions.receivedMails(recievedMails));
-        navigate("/inbox", { replace: true });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    //       recievedMails.push({
+    //         key: key,
+    //         // toEmail: data[key].toEmail,
+    //         fromEmail: data[key].fromEmail,
+    //         date: data[key].date,
+    //         subject: data[key].subject,
+    //         mailContent: data[key].mailContent,
+    //         id: data[key].id,
+    //         unread: data[key].unread,
+    //       });
+    //     }
+    //     console.log("recieve data", recievedMails);
+    //     dispatch(inboxActions.receivedMails(recievedMails));
+    //     navigate("/inbox", { replace: true });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
 
   const draftHandler = () => {
