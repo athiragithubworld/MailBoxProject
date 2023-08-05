@@ -1,9 +1,10 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../Store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 
 const Headers = () => {
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -34,7 +35,7 @@ const Headers = () => {
         >
           Welcome to Cloud Mail
         </h1>
-
+        <h6 style={{ color: "white" }}> Login User : {auth.email}</h6>
         <span style={{ marginLeft: "120px" }}>
           <button
             style={{ borderRadius: "20px" }}
