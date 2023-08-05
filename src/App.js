@@ -42,7 +42,9 @@ function App() {
           });
         }
         console.log("recieve data", recievedMails);
-        dispatch(inboxActions.receivedMails(recievedMails));
+        if (recievedMails) {
+          dispatch(inboxActions.receivedMails(recievedMails));
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -73,19 +75,38 @@ function App() {
           });
         }
         console.log("sent data", sentedMails);
-        dispatch(SentMailActions.sentedMails(sentedMails));
+        if (sentedMails) {
+          dispatch(SentMailActions.sentedMails(sentedMails));
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
+  let recieveMailInterval;
+  let sentMailInterval;
+  clearInterval(recieveMailInterval);
+  useEffect(() => {
+    // let sentMailInterval = setInterval(sentedMailData, 2000);
+    // let recieveMailInterval = setInterval(receiveMailData, 2000);
+    // setTimeout(() => {
+    // clearInterval(recieveMailInterval);
+    //   console.log("Stopped fetching email list.");
+    // }, 10000);
+  }, []);
 
   useEffect(() => {
     if (auth.isLoggedIn) {
       receiveMailData();
       sentedMailData();
+      recieveMailInterval = setInterval(receiveMailData, 2000);
+      sentMailInterval = setInterval(sentedMailData, 2000);
     }
-  }, []);
+    return () => {
+      clearInterval(recieveMailInterval);
+      clearInterval(sentMailInterval);
+    };
+  }, [auth.isLoggedIn]);
 
   useEffect(() => {
     //  if (auth.isLoggedIn) {
