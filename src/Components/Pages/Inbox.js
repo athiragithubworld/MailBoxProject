@@ -190,7 +190,7 @@ const Inbox = () => {
                             <CiStar />
                           </td>
                           <td class="subject">{item.subject}</td>
-                          <td class="sender">{item.fromEmail}</td>
+                          <td class="sender">From : {item.fromEmail}</td>
                           <td class="Date">{item.date}</td>
                           <td class="action">
                             <IoIosMail />
